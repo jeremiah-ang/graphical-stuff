@@ -15,19 +15,6 @@ Drawer.prototype.drawLine = function (p1, p2) {
 	this.ctx.closePath();
 }
 
-
-Drawer.prototype.drawSquare = function (square) {
-	this.ctx.beginPath();
-	this.ctx.moveTo (square.coord[0].x, square.coord[0].y);
-	var self = this;
-	square.coord.forEach (function (coord) {
-		self.ctx.lineTo(coord.x, coord.y);
-	});
-	this.ctx.lineTo (square.coord[0].x, square.coord[0].y);
-	this.ctx.stroke();
-	this.ctx.closePath();
-}
-
 Drawer.prototype.drawIsometricSquare = function (square, shouldFill) {
 	var self = this;
 	this.ctx.beginPath();
