@@ -1,0 +1,26 @@
+<html>
+	<head>
+		<title> Perspective </title>
+	</head>
+	<body>
+		<center>
+			<canvas id = "perspective" width = 650 height = 650 style = 'border: black solid 1px'></canvas>
+		</center>
+	</body>
+
+	<script src = "../api/xlabs.js" type = 'text/javascript'></script>
+	<script src = "Point.js" type = "text/javascript"></script>
+	<script src = "Vector.js" type = "text/javascript"></script>
+	<script src = "Square.js" type = 'text/javascript'></script>
+	<script src = "Drawer.js" type = 'text/javascript'></script>
+	<script src = "Head.js" type = 'text/javascript'></script>
+	<script src = "Perspective.js" type = 'text/javascript'></script>
+	<script>
+		window.onload = function () {	
+			var p = new Perspective ();
+			p.render();
+			p.start();
+		}
+
+	</script>
+</html>

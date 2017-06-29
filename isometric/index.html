@@ -1,0 +1,28 @@
+<html>
+	<head>
+		<title> Isometric </title>
+		<style> 
+		</style>
+	</head>
+	<body>
+		<center><canvas height = 640 width = 640 id = "isometric" style='border:black solid 2px'></canvas></center>
+	</body>
+	<script src = "Angles.js" type = "text/javascript"></script>
+	<script src = "Point.js" type = "text/javascript"></script>
+	<script src = "IsometricSquare.js" type = "text/javascript"></script>
+	<script src = "GridGenerator.js" type = "text/javascript"></script>
+	<script src = "Drawer.js" type = "text/javascript"></script>
+	<script> 
+		window.onload = function () {
+			var d = new Drawer("isometric");
+			var gg = new GridGenerator(320, 120, 4, 4, 70, d);
+			gg.render(1,2);
+
+			console.log (d.canvas.offsetTop, d.canvas.style.border);
+
+			d.canvas.onmousemove = function (e) {
+				gg.render(e.pageX - d.canvas.offsetLeft, e.pageY - d.canvas.offsetTop);
+			}
+		}
+	</script>
+</html>
