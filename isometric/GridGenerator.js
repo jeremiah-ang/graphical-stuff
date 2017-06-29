@@ -45,3 +45,10 @@ GridGenerator.prototype.render = function (x, y) {
 	if (this.squares[Math.floor(coord.y)] && this.squares[Math.floor(coord.y)][Math.floor(coord.x)])
 		this.drawer.drawIsometricSquare(this.squares[Math.floor(coord.y)][Math.floor(coord.x)], true);
 }
+
+GridGenerator.prototype.click = function (x, y) {
+	var coord = IsometricSquare.sqCoordToIndex(IsometricSquare.isoCoordToSqCoord(x, y, this.x, this.y, this.l));
+	if (this.squares[Math.floor(coord.y)] && this.squares[Math.floor(coord.y)][Math.floor(coord.x)])
+		this.squares[Math.floor(coord.y)][Math.floor(coord.x)].changeColor();
+	this.render();
+}

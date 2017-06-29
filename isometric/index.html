@@ -15,14 +15,16 @@
 	<script> 
 		window.onload = function () {
 			var d = new Drawer("isometric");
-			var gg = new GridGenerator(320, 120, 4, 4, 70, d);
+			var gg = new GridGenerator(320, 120, 5, 5, 70, d);
 			gg.render(1,2);
-
-			console.log (d.canvas.offsetTop, d.canvas.style.border);
 
 			d.canvas.onmousemove = function (e) {
 				gg.render(e.pageX - d.canvas.offsetLeft, e.pageY - d.canvas.offsetTop);
 			}
+
+			d.canvas.addEventListener("click", function (e) {
+				gg.click (e.pageX - d.canvas.offsetLeft, e.pageY - d.canvas.offsetTop);
+			})
 		}
 	</script>
 </html>
