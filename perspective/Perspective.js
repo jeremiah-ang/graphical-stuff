@@ -1,22 +1,22 @@
-function Perspective () {
+function Perspective (id) {
 
 	var self = this;
 
-	this.drawer = new Drawer("perspective");
-
-	this.x = 250;
-	this.y = 100;
-	this.head = new Head();
+	this.drawer = new Drawer(id);
+	this.head = new Head(this.drawer.canvas);
+	this.vp = new Point (250, 100, 0);
 
 	this.squares = this.makeSquares([
 		{
 			x: 175,
 			y: 175,
+			z: 0,
 			l: 150,
 		},
 		{
 			x: 30,
 			y: 40,
+			z: 0,
 			l: 100
 		}
 	]);
@@ -27,17 +27,35 @@ function Perspective () {
 
 Perspective.prototype.start = function () {
 	var self = this;
-	this.head.start(function () {
-	}, function (x, y) {
-		self.setVP(x - self.drawer.getOffsetX(),y);
-	});
+	this.head.start(
+		// START
+		function () {}, 
+
+		// UPDATE
+		function (x, y, z) {
+			self.setVP(x - self.drawer.getOffsetX(),y,z);
+			self.render();
+		}
+	);
 }
 
-Perspective.prototype.setVP = function (x, y) {
-	this.x = x;
-	this.y = y;
-	this.render();
+
+///////////////////////////
+///			VP 			///
+///////////////////////////
+
+Perspective.prototype.setVP = function (x, y, z) {
+	this.vp.x = x;
+	this.vp.y = y;
+	this.vp.z = z;
 }
+Perspective.prototype.getVP = function () {
+	return this.vp;
+}
+
+///////////////////////////
+///	      SQUARES 	    ///
+///////////////////////////
 
 Perspective.prototype.makeSquares = function (arr) {
 	arr.forEach(function (sq, idx) {
@@ -56,16 +74,16 @@ Perspective.prototype.getInfinity = function () {
 	s.setDepth(0.2);
 	s.setLayer(5);
 	infinity.push(s);
-
 	return infinity;
 }
 
-Perspective.prototype.getVP = function () {
-	return new Point(this.x, this.y);
-}
+
+///////////////////////////
+///		  RENDER		///
+///////////////////////////
+
 Perspective.prototype.render = function () {
 	this.drawer.clear();
-
 	this.drawer.drawSquares (this.getSquares(), this.getVP());
-	this.drawer.drawSquares (this.getInfinity(), this.getVP(), true);
+	//this.drawer.drawSquares (this.getInfinity(), this.getVP(), true);
 }

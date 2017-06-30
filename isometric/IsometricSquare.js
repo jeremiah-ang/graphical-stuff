@@ -17,7 +17,7 @@ function IsometricSquare (x, y, offsetX, offsetY, l) {
 	this.x = index.x;
 	this.y = index.y;
 
-	this.fill = 'black';
+	this.fill = 'white';
 	this.stroke = 'black';
 
 	this.flipped = false;
@@ -25,7 +25,7 @@ function IsometricSquare (x, y, offsetX, offsetY, l) {
 
 IsometricSquare.prototype.setFill = function (fill) { this.fill = fill; }
 IsometricSquare.prototype.setStroke = function (stroke) { this.stroke = stroke; }
-IsometricSquare.prototype.changeColor = function () { this.fill = "pink"; this.flipped = true; }
+IsometricSquare.prototype.changeColor = function () { this.fill = "grey"; this.flipped = true; }
 
 IsometricSquare.prototype.forEach = function (fn) {
 	fn (this.base, this.left, 0);

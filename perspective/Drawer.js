@@ -50,27 +50,28 @@ Drawer.prototype.getOffsetX = function () {
 	return (screenWidth - canvasWidth) / 2;
 }
 
-Drawer.prototype.drawDottedSquare = function (square, steps, size = 1) {
+Drawer.prototype.drawDottedSquare = function (square_points, steps, size = 1) {
 	this.ctx.beginPath();
 	this.ctx.fillStyle = "white";
 	this.ctx.strokeStyle = "black";
 
-	this.drawDottedLine (square.tl, square.tr, steps, size);
-	this.drawDottedLine (square.tr, square.br, steps, size);
-	this.drawDottedLine (square.br, square.bl, steps, size);
-	this.drawDottedLine (square.bl, square.tl, steps, size);
+	for (var i = 1; i < square_points.length; i++) {
+		this.drawDottedLine (square_points[i - 1], square_points[i], steps, size);
+	}
+	this.drawDottedLine (square_points[3], square_points[0], steps, size);
 
 }
 
-Drawer.prototype.drawSquare = function (square) {
+Drawer.prototype.drawSquare = function (square_points) {
+
 	this.ctx.beginPath();
 	this.ctx.fillStyle = "white";
 	this.ctx.strokeStyle = "black";
 
-	this.drawLine (square.tl, square.tr);
-	this.drawLine (square.tr, square.br);
-	this.drawLine (square.br, square.bl);
-	this.drawLine (square.bl, square.tl);
+	for (var i = 1; i < square_points.length; i++) {
+		this.drawLine (square_points[i - 1], square_points[i]);
+	}
+	this.drawLine (square_points[3], square_points[0]);
 
 }
 
