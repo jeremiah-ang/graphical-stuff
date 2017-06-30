@@ -64,14 +64,7 @@ Drawer.prototype.drawDottedSquare = function (square_points, steps, size = 1) {
 
 Drawer.prototype.drawSquare = function (square_points) {
 
-	this.ctx.beginPath();
-	this.ctx.fillStyle = "white";
-	this.ctx.strokeStyle = "black";
-
-	for (var i = 1; i < square_points.length; i++) {
-		this.drawLine (square_points[i - 1], square_points[i]);
-	}
-	this.drawLine (square_points[3], square_points[0]);
+	this.drawQuad (square_points, "#333", "white");
 
 }
 
@@ -81,6 +74,23 @@ Drawer.prototype.drawSquares = function (squares, vp, dotted = false) {
 	squares.forEach (function (square) {
 		square.draw(self, vp, dotted);
 	});
+}
+
+Drawer.prototype.drawQuad = function (pts, fill, stroke) {
+	this.ctx.beginPath();
+	this.ctx.fillStyle = fill;
+	this.ctx.strokeStyle = stroke;
+
+	this.ctx.moveTo (pts[0].x, pts[0].y);
+	for (var i = 0; i < pts.length; i++) {
+		this.ctx.lineTo (pts[i].x, pts[i].y);
+	}
+	this.ctx.lineTo (pts[0].x, pts[0].y);
+
+	this.ctx.stroke();
+	this.ctx.fill();
+
+	this.ctx.closePath();
 }
 
 Drawer.prototype.clear = function () {

@@ -3,6 +3,13 @@ function Square (points, length = null, depth = 0.1, layer = 1) {
 	this.length = length;
 	this.depth = depth;
 	this.layer = layer;
+
+	this.wallColor = [
+		"#999",
+		"#666",
+		"#555",
+		"#444"
+	]
 }
 
 Square.prototype.setDepth = function (depth) { this.depth = depth; }
@@ -18,34 +25,60 @@ Square.prototype.draw = function (drawer, vp, dotted) {
 	} 
 
 	// draw smaller square
-	this.drawSmallerSquare (zoomed, drawer, vp, dotted);
+
+	var smaller_square = this.getSmallerSquare (zoomed, vp);
+	smaller_square.draw(drawer, vp, dotted);
+	this.drawSmallerSquare (smaller_square, drawer, dotted);
+	this.drawSideWalls (zoomed, smaller_square, drawer, dotted);
 	// Draw Face of main square
-	if(!dotted)
-		drawer.drawSquare(zoomed);
+	if(!dotted) drawer.drawSquare(zoomed);
 }
 
-Square.prototype.drawSmallerSquare = function (bigger_square_points, drawer, vp, dotted) {
-	// Smaller Square
-
-	var smaller_square_points = this.scale (bigger_square_points, vp, this.depth);
-	var smaller_square = new Square (
-		smaller_square_points,
-		this.length, this.depth, this.layer - 1);
+Square.prototype.getSmallerSquare = function (bigger_square_points, vp) {
+	return new Square (
+		this.scale (bigger_square_points, vp, this.depth),
+		this.length, this.depth, this.layer - 1
+	);
+}
+Square.prototype.drawSmallerSquare = function (smaller_square, drawer, dotted) {
 	
 	// Draw Face of smaller square
-	if (dotted)
-		drawer.drawDottedSquare(smaller_square_points, 10, 0.1);
-	else drawer.drawSquare(smaller_square_points);
+	if (dotted) drawer.drawDottedSquare(smaller_square.points, 10, 0.1);
+	else drawer.drawSquare(smaller_square.points);
 
+}
+Square.prototype.drawSideWalls = function (bigger_square_points, smaller_square, drawer, dotted) {
 	// Draw lines connecting the corners of big square to small square
-	bigger_square_points.forEach(function(point, idx){
-		if (dotted) 
-			drawer.drawDottedLine(point, smaller_square_points[idx], 10);
-		else drawer.drawLine(point, smaller_square_points[idx], 10);
-	});
+	var self = this;
+	if (dotted) {
+		bigger_square_points.forEach(function(point, idx){
+			drawer.drawDottedLine(point, smaller_square.points[idx], 10);
+		});
+	} else {
+		var idxs;
 
-	// Draw smaller square of smalelr square
-	smaller_square.draw(drawer, vp, dotted);
+		if (bigger_square_points[0].y > smaller_square.points[0].y) {
+			idxs = [2, 1, 3, 0];
+		} else if (bigger_square_points[3].y < smaller_square.points[3].y) {
+			idxs = [0, 1, 3, 2];
+		} else {
+			idxs = [0, 2, 1, 3];
+		}
+
+		// top
+		idxs.forEach (function (idx) {
+			drawer.drawQuad([
+				bigger_square_points[idx],
+				smaller_square.points[idx],
+				smaller_square.points[(idx + 1) % 4],
+				bigger_square_points[(idx + 1) % 4]],
+				self.wallColor[idx],
+				"white"
+			);
+		})
+	}
+	
+	
 }
 
 Square.prototype.scale = function (initial_points, vp, ratio) {

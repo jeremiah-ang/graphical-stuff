@@ -1,11 +1,9 @@
 function Head (canvas) {
-	this.type = "MOUSE";
+	this.type = "HEAD";
 
 	this.calibrating = true;
 	this.calibrated = {
-		x: 0,
-		y: 0,
-		z: 0,
+		point: new Point(0, 0),
 		t: 0
 	}
 
@@ -17,31 +15,37 @@ function Head (canvas) {
 	this.sensitivity = 400;
 }
 
-Head.prototype.setCalibrating = function () {
-	this.canvas.style.display = 'none';
+Head.prototype.start = function (ready, update) {
+	var self = this;
+
+	if (this.type == "MOUSE")
+		this.trackMouse (ready, update);
+	else if (this.type == 'HEAD')
+		this.trackHead (ready, update);
 }
 
-Head.prototype.finishCalibrating = function () {
-	this.calibrating = false;
-	this.canvas.style.display = 'initial';
-}
-
+///////////////////////////////////
+///         TRACK HEAD          ///
+///////////////////////////////////
 Head.prototype.trackHead = function (ready, update) {
-	this.setCalibrating();
+
+	this.startCalibrating();
 
 	var self = this;
 	var Head = {
 
 		update : function() {
 			var head = xLabs.getConfig ("state.head");
-			var x = head.x;
-			var y = head.y;
-			var z = head.z;
+			delete head.features;
+			var point = new Point(0,0);
+			for (var key in head) {
+				point[key] = parseFloat(head[key]);
+			}
 
 			if (self.isCalibrating()) 
-				self.calibrate (x, y, z);
+				self.calibrate (point);
 			else 
-				self.headDidMove (x, y, z, update);
+				self.headDidMove (point, update);
 		},
 
 		ready : function() {
@@ -59,26 +63,46 @@ Head.prototype.trackHead = function (ready, update) {
 	xLabs.setup( Head.ready, Head.update, null, "292ca114-6ea6-443d-a36e-b607dce1a312" );
 }
 
-Head.prototype.headDidMove = function (x, y, z, update) {
+Head.prototype.headDidMove = function (point, update) {
 
-	var amountMoveX = this.calibrated.x - parseFloat(x);
-	var amountMoveY = this.calibrated.y - parseFloat(y);
-	var amountMoveZ = (parseFloat(z) - this.calibrated.z).toFixed(3);
+	var amountMove = new Point (0,0);
 
-	var _x = this.centerOfCanvas.x + amountMoveX * this.sensitivity;
-	var _y = this.centerOfCanvas.y - amountMoveY * this.sensitivity;
+	for (var key in point) {
+		amountMove[key] = this.calibrated.point[key] - point[key];
+	}
 
-	update(_x, _y, amountMoveZ);
+	amountMove.z = (-amountMove.z).toFixed(3);
+	amountMove.x = this.centerOfCanvas.x + amountMove.x * this.sensitivity;
+	amountMove.y = this.centerOfCanvas.y - amountMove.y * this.sensitivity;
+	amountMove.yaw = amountMove.yaw * this.sensitivity;
+
+	console.log (amountMove.yaw);
+
+	update(amountMove);
+}
+
+///////////////////////////////////
+///         CALIBRATION         ///
+///////////////////////////////////
+
+Head.prototype.startCalibrating = function () {
+	this.canvas.style.display = 'none';
+}
+
+Head.prototype.finishCalibrating = function () {
+	this.calibrating = false;
+	this.canvas.style.display = 'initial';
 }
 
 Head.prototype.isCalibrating = function () {
 	return this.calibrating;
 }
 
-Head.prototype.calibrate = function (x, y, z) {
-	this.calibrated.x = this.calculateAvg(this.calibrated.x, this.calibrated.t, parseFloat(x));
-	this.calibrated.y = this.calculateAvg(this.calibrated.y, this.calibrated.t, parseFloat(y));
-	this.calibrated.z = this.calculateAvg(this.calibrated.z, this.calibrated.t, parseFloat(z));
+Head.prototype.calibrate = function (point) {
+
+	for (var coord in this.calibrated.point) {
+		this.calibrated.point[coord] = this.calculateAvg(this.calibrated.point[coord], this.calibrated.t, point[coord])
+	}
 
 	if (++this.calibrated.t > 20)
 		this.finishCalibrating();
@@ -88,14 +112,9 @@ Head.prototype.calculateAvg = function (avg, n, x) {
 	return (avg * n + x) / (n + 1);
 }
 
-Head.prototype.start = function (ready, update) {
-	var self = this;
-
-	if (this.type == "MOUSE")
-		this.trackMouse (ready, update);
-	else if (this.type == 'HEAD')
-		this.trackHead (ready, update);
-}
+///////////////////////////////////
+///            MOUSE            ///
+///////////////////////////////////
 
 Head.prototype.trackMouse = function (ready, update) {
 	document.onmousemove = function (e) {
