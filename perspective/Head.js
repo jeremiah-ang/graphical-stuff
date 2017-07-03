@@ -65,18 +65,13 @@ Head.prototype.trackHead = function (ready, update) {
 
 Head.prototype.headDidMove = function (point, update) {
 
-	var amountMove = new Point (0,0);
-
-	for (var key in point) {
-		amountMove[key] = this.calibrated.point[key] - point[key];
-	}
-
-	amountMove.z = (-amountMove.z).toFixed(3);
+	var amountMove = point.calibrate(this.calibrated.point);
+	amountMove.z = (-(amountMove.z / 10)).toFixed(3);
 	amountMove.x = this.centerOfCanvas.x + amountMove.x * this.sensitivity;
 	amountMove.y = this.centerOfCanvas.y - amountMove.y * this.sensitivity;
-	amountMove.yaw = amountMove.yaw * this.sensitivity;
+	amountMove.yaw = amountMove.yaw * this.sensitivity / 5;
+	amountMove.pitch = amountMove.pitch * this.sensitivity / 5;
 
-	console.log (amountMove.yaw);
 
 	update(amountMove);
 }
@@ -120,6 +115,9 @@ Head.prototype.trackMouse = function (ready, update) {
 	document.onmousemove = function (e) {
 		var x = e.pageX;
 		var y = e.pageY;
-		update(x,y,0);
+		var point = new Point(x, y, 0);
+		point.yaw = x/2;
+		point.pitch = y/2;
+		update(point);
 	}
 }

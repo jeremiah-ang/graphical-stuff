@@ -3,6 +3,7 @@ function Square (points, length = null, depth = 0.1, layer = 1) {
 	this.length = length;
 	this.depth = depth;
 	this.layer = layer;
+	this.translated = false;
 
 	this.wallColor = [
 		"#999",
@@ -14,11 +15,14 @@ function Square (points, length = null, depth = 0.1, layer = 1) {
 
 Square.prototype.setDepth = function (depth) { this.depth = depth; }
 Square.prototype.setLayer = function (layer) { this.layer = layer; }
+Square.prototype.setTranslated = function (translated) { this.translated = true; }
 Square.prototype.forEach = function (fn) { this.points.forEach(fn); }
 
 Square.prototype.draw = function (drawer, vp, dotted) {
 	// Zoom
-	var zoomed = this.scale(this.points, vp, vp.z);
+	vp = this.translate ([vp], vp.yaw, vp.pitch)[0];
+	var x_translated = this.translate (this.points, vp.yaw, vp.pitch);
+	var zoomed = this.scale(x_translated, vp, vp.z);
 
 	if (this.layer < 1) {
 		return //(!dotted) ? drawer.drawSquare(zoomed) : null;
@@ -27,6 +31,7 @@ Square.prototype.draw = function (drawer, vp, dotted) {
 	// draw smaller square
 
 	var smaller_square = this.getSmallerSquare (zoomed, vp);
+	smaller_square.setTranslated (true);
 	smaller_square.draw(drawer, vp, dotted);
 	this.drawSmallerSquare (smaller_square, drawer, dotted);
 	this.drawSideWalls (zoomed, smaller_square, drawer, dotted);
@@ -94,11 +99,30 @@ Square.prototype.scale = function (initial_points, vp, ratio) {
 	return points;
 }
 
+Square.prototype.translate = function (points, offsetX, offsetY) {
 
-Square.make = function (top_left, length) {
+	if (this.translated)
+		return points;
+
+	var translated = [];
+	var new_point;
+	points.forEach (function (point, idx) {
+		new_point = point.clone();
+		new_point.x = new_point.x + offsetX;
+		new_point.y = new_point.y + offsetY;
+		translated.push(new_point);
+	});
+	return translated;
+
+	//return points;
+}
+
+
+Square.make = function (top_left, length, z) {
 	var tr = new Point (top_left.x + length, top_left.y);
 	var br = new Point (tr.x, tr.y + length);
 	var bl = new Point (br.x - length, br.y);
+
 	return new Square([top_left, tr, br, bl], length);
 }
 

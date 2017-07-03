@@ -25,8 +25,8 @@ function Perspective (id) {
 		{
 			x: 405,
 			y: 405,
-			z: -0.3,
-			l: 100,
+			z: 1,
+			l: 150,
 		},
 		
 	]);
@@ -96,6 +96,6 @@ Perspective.prototype.getInfinity = function () {
 
 Perspective.prototype.render = function () {
 	this.drawer.clear();
-	this.drawer.drawSquares (this.getInfinity(), this.getVP(), true);
+	// this.drawer.drawSquares (this.getInfinity(), this.getVP(), true);
 	this.drawer.drawSquares (this.getSquares(), this.getVP());
 }
